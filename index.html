@@ -115,12 +115,14 @@
             margin-bottom: 40px;
         }
 
-        .card {
+		.card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 0; /* EZ A KULCS: Engedi a kártyát összezsugorodni a képernyő szélességére */
+            word-wrap: break-word; /* Hosszú szövegek tördelése */
         }
 
         .card h3 {
@@ -135,6 +137,8 @@
             padding: 10px;
             background-color: rgba(0,0,0,0.05);
             border-radius: 5px;
+            overflow-x: auto; /* Globálisan engedélyezi a vízszintes görgetést a képleteknél */
+            max-width: 100%;  /* Megakadályozza a kártya kifeszítését */
         }
 
         /* Harmonika (Fogalmak) */
