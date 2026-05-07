@@ -275,6 +275,76 @@
         .profit-table td:hover {
             background-color: rgba(0,0,0,0.03);
         }
+		/* ========================================== */
+        /* MOBIL NÉZET (Reszponzivitás)               */
+        /* ========================================== */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column; /* Egymás alá rendezi a menüt és a tartalmat */
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative; /* Nem ragad a bal oldalra */
+                display: flex;
+                flex-wrap: wrap; /* Engedi több sorba törni a gombokat */
+                justify-content: center;
+                padding: 15px 10px;
+            }
+
+            .sidebar h2 {
+                width: 100%;
+                margin-bottom: 10px;
+                font-size: 1.3rem;
+            }
+
+            .nav-btn {
+                width: auto;
+                flex: 1 1 30%; /* Egymás mellé teszi a 3 gombot */
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 0.9rem;
+                margin: 3px;
+                border-radius: 5px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr; /* Mobilon 1 oszlopos legyen a kártyák listája */
+            }
+
+            .formula {
+                overflow-x: auto; /* Ha nagyon hosszú a képlet, lehessen oldalra görgetni, ne lógjon le a képernyőről */
+                font-size: 1.1rem;
+            }
+
+            /* Táblázat csúszkássá tétele mobilon */
+            .profit-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
 
     </style>
 </head>
