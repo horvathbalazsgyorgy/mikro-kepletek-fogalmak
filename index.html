@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mikroökonómia Tudásbázis</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+		:root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --sidebar-bg: #111;
+            --sidebar-text: #ecf0f1;
+            --card-bg: #2d2d2d;
+            --accent-color: #f39c12; /* Arany/Narancs */
+            --border-color: #444;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigáció */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 0;
+            position: fixed;
+            height: 100%;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            text-align: left;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--accent-color);
+        }
+
+        /* Fő tartalom */
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+            width: calc(100% - 250px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .theme-toggle {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        h2.section-title {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        /* Kártyák (Képletek) */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .formula {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 5px;
+        }
+
+        /* Harmonika (Fogalmak) */
+        .accordion {
+            margin-bottom: 40px;
+        }
+
+        .accordion-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .accordion-header:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .accordion-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            padding: 20px;
+            max-height: 500px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Kvíz Gomb és Modal */
+        .quiz-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .quiz-submit {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .correct { color: var(--success-color); }
+        .incorrect { color: var(--error-color); }
+		
+		/* Költség/Profit Táblázat (Kép helyettesítése) */
+        .profit-table {
+            width: 100%;
+            max-width: 800px;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .profit-table td {
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            vertical-align: middle;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+        .profit-table td:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+    <nav class="sidebar">
+        <h2>Mikroökonómia</h2>
+        <button class="nav-btn active" onclick="showSection('blokk1')">I. Blokk (1-2. fej.)</button>
+        <button class="nav-btn" onclick="showSection('blokk2')">II. Blokk (3. fej.)</button>
+        <button class="nav-btn" onclick="showSection('blokk3')">III. Blokk (4-5. fej.)</button>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Vizsgafelkészítő Tudásbázis</h1>
+        </div>
+
+        <section id="blokk1" class="section-content active">
+            <h2 class="section-title">I. Blokk: Piaci alapfogalmak, adózás és rugalmasságok</h2>
+            
+            <h3>Képletek</h3>
+				<br>
+				<div class="card-grid">
+                
+                <div class="card">
+                    <h4>Keresleti függvény</h4>
+                    <div class="formula">$$p = a - bQ$$</div>
+                    <p><strong>Mire használjuk:</strong> A fogyasztók által keresett mennyiség és az ár közötti összefüggést mutatja.</p>
+                    <p><strong>Összefüggés:</strong> Inverz formája a \( P(Q) \), amiből a határbevétel (MR) könnyen származtatható.</p>
+                    <p><em>Példa:</em> \( p = 100 - 2Q \). A maximális ár 100, a meredekség 2.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Kínálati függvény</h4>
+                    <div class="formula">$$Q(p) = c + d \cdot p$$</div>
+                    <p><strong>Mire használjuk:</strong> A termelők által kínált mennyiség és az ár közötti kapcsolat modellezése.</p>
+                    <p><strong>Összefüggés:</strong> Rövid távon a határköltség (MC) görbe üzemszüneti pont feletti része adja meg.</p>
+                    <p><em>Példa:</em> \( Q = -10 + 2p \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Piaci egyensúly</h4>
+                    <div class="formula">$$Q_D = Q_S$$</div>
+                    <p><strong>Mire használjuk:</strong> Annak az árnak (\( p^* \)) és mennyiségnek (\( Q^* \)) a meghatározása, ahol a piac megtisztul.</p>
+                    <p><strong>Összefüggés:</strong> Ebben a pontban maximális az adó nélküli társadalmi jólét (SW).</p>
+                    <p><em>Példa:</em> \( 100 - 2Q = 10 + Q \rightarrow 3Q = 90 \rightarrow Q^* = 30 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Fogyasztói többlet (FT)</h4>
+                    <div class="formula">$$FT = \frac{(p_{rez} - p^*) \cdot Q^*}{2}$$</div>
+                    <p><strong>Mire használjuk:</strong> A vásárlók által elért jóléti nyereség (megtakarítás) a piaci árhoz képest. A \( p_{rez} \) (rezervációs ár) itt azt a maximális árat jelenti, amit a fogyasztó még éppen hajlandó kifizetni a termékért.</p>
+                    <p><strong>Összefüggés:</strong> A Marshall-keresztben a keresleti görbe és az egyensúlyi ár közötti háromszög.</p>
+                    <p><em>Példa:</em> \( p_{rez}=100, p^*=70, Q=15 \rightarrow FT = 225 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Termelői többlet (TT)</h4>
+                    <div class="formula">$$TT = \frac{(p^* - p_{rez}) \cdot Q^*}{2}$$</div>
+                    <p><strong>Mire használjuk:</strong> Az eladók által elért jóléti nyereség a piaci árhoz képest. A \( p_{rez} \) (termelői rezervációs ár) itt azt a minimális árat jelenti, amennyiért az eladó már hajlandó piacra vinni/legyártani a terméket.</p>
+                    <p><strong>Összefüggés:</strong> A Marshall-keresztben a kínálati görbe és az egyensúlyi ár közötti háromszög.</p>
+                    <p><em>Példa:</em> \( p^*=50, p_{rez}=20, Q=30 \rightarrow TT = 450 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Mennyiségi adó / Bruttó-nettó ár</h4>
+                    <div class="formula">$$p_B = p_N + t$$</div>
+                    <p><strong>Mire használjuk:</strong> Fix összegű adó (\( t \)) minden eladott darab után. Kifejezi az adóéket.</p>
+                    <p><strong>Összefüggés:</strong> Módosítja a görbéket (párhuzamos eltolás). A vevő többet fizet, az eladó kevesebbet kap.</p>
+                    <p><em>Példa:</em> Literenkénti 20 Ft adó: \( p_B = p_N + 20 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Értékadó (\( \tau \))</h4>
+                    <div class="formula">$$p_B = p_N \cdot (1 + \tau)$$</div>
+                    <p><strong>Mire használjuk:</strong> Az ár százalékában kifejezett adó (pl. ÁFA).</p>
+                    <p><strong>Összefüggés:</strong> A kínálati görbe meredekségét változtatja meg (elforgatja az origóból).</p>
+                    <p><em>Példa:</em> Nettó ár 100, \( \tau=27\% \rightarrow \) Bruttó ár 127.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Adóbevétel (T)</h4>
+                    <div class="formula">$$T = t \cdot Q_{adó}$$</div>
+                    <p><strong>Mire használjuk:</strong> Az államhoz befolyó teljes adóösszeg kiszámítása.</p>
+                    <p><strong>Összefüggés:</strong> A társadalmi jólét (SW) kiszámításakor "visszaadjuk" a társadalomnak.</p>
+                    <p><em>Példa:</em> \( t=20, Q=1000 \rightarrow T = 20\,000 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Társadalmi jólét (SW)</h4>
+                    <div class="formula">$$SW = FT + TT + T$$</div>
+                    <p><strong>Mire használjuk:</strong> A gazdaság szereplőinek összesített jóléti mutatója. (Adó nélkül csak FT + TT).</p>
+                    <p><strong>Összefüggés:</strong> Árplafon vagy árpadló esetén nincs állami bevétel (\( T=0 \)), a módosult FT és TT összegéből áll, és a HTV miatt az eredeti SW-hez képest csökken.</p>
+                    <p><em>Példa:</em> Adóval: \( FT=70, TT=50, T=40 \rightarrow SW = 160 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Holtteher-veszteség (HTV)</h4>
+                    <div class="formula">$$HTV = \frac{(p_D - p_S) \cdot (Q_{opt} - Q_{tényleges})}{2}$$</div>
+                    <p><strong>Mire használjuk:</strong> Az adó vagy árkötöttség miatt elmaradt tranzakciók értéke.</p>
+                    <p><strong>Összefüggés:</strong> Számítása a monopóliumhoz hasonló: a keresleti és kínálati ár közötti árolló és az elmaradt mennyiség által bezárt háromszög területe. A társadalom tiszta vesztesége.</p>
+                    <p><em>Példa:</em> Árplafon: vevőnek 110-et ér, eladó 50-et kap (\( p_D-p_S=60 \)). Elmaradt forgalom: 30 db \( \rightarrow HTV = 900 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Pontrugalmasság</h4>
+                    <div class="formula">$$\epsilon = \frac{dQ}{dp} \cdot \frac{p}{Q}$$</div>
+                    <p><strong>Mire használjuk:</strong> A kereslet vagy kínálat árérzékenységének mérése egyetlen, konkrét pontban.</p>
+                    <p><strong>Összefüggés:</strong> Függvény deriváltját (meredekség inverze) szorozzuk az adott pont árával és mennyiségével.</p>
+                    <p><em>Példa:</em> Kereslet deriváltja -2, \( p=10, Q=80 \rightarrow \epsilon = -0,25 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Ívrugalmasság</h4>
+                    <div class="formula">$$\epsilon = \frac{Q_2 - Q_1}{p_2 - p_1} \cdot \frac{p_1 + p_2}{Q_1 + Q_2}$$</div>
+                    <p><strong>Mire használjuk:</strong> A rugalmasság átlagos értékének mérése két pont (nagyobb árváltozás) között.</p>
+                    <p><strong>Összefüggés:</strong> Kiküszöböli azt a problémát, hogy az induló vagy a végpontot vegyük-e alapul a százalékos számításnál.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Sajátár-rugalmasság és Bevétel</h4>
+                    <div class="formula">$$\epsilon_p = \frac{\Delta Q}{\Delta p} \cdot \frac{p}{Q}$$</div>
+                    <p><strong>Mire használjuk:</strong> A kereslet rugalmassága és a bevétel (TR) kapcsolata. Értéke lehet \( |\epsilon| > 1 \) vagy \( |\epsilon| < 1 \).</p>
+                    <p><strong>Összefüggés:</strong> Rugalmas (\( |\epsilon|>1 \)): árcsökkentés \( \rightarrow \) TR nő. Rugalmatlan (\( |\epsilon|<1 \)): árcsökkentés \( \rightarrow \) TR csökken. (Számítása pont- vagy ívrugalmassággal).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Kínálat árrugalmassága</h4>
+                    <div class="formula">$$\epsilon_s = \frac{\% \Delta Q_s}{\% \Delta p}$$</div>
+                    <p><strong>Mire használjuk:</strong> Megmutatja, mennyire érzékenyen reagál a termelés az árra.</p>
+                    <p><strong>Összefüggés:</strong> Értéke általában pozitív. Számítása függvényből pontrugalmassággal, két adatpárnál ívrugalmassággal.</p>
+                    <p><em>Példa:</em> \( \epsilon_s=1,5 \rightarrow \) 10% áremelkedés 15% kínálatbővülést eredményez.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Jövedelemrugalmasság</h4>
+                    <div class="formula">$$\epsilon_I = \frac{\% \Delta Q}{\% \Delta I}$$</div>
+                    <p><strong>Mire használjuk:</strong> Méri, hogy a termék hogyan reagál a fizetések változására.</p>
+                    <p><strong>Összefüggés:</strong> Számítása pont- vagy ívrugalmassággal. \( \epsilon_I < 0 \): inferior; \( 0 < \epsilon_I < 1 \): alapvető; \( \epsilon_I > 1 \): luxus jószág.</p>
+                    <p><em>Példa:</em> Kenyér (\( \epsilon_I=0,2 \)): alapvető; Gyémánt (\( \epsilon_I=3 \)): luxus.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Keresztár-rugalmasság</h4>
+                    <div class="formula">$$\epsilon_{x,y} = \frac{\% \Delta Q_x}{\% \Delta p_y}$$</div>
+                    <p><strong>Mire használjuk:</strong> Két termék (X és Y) közötti kapcsolat meghatározása.</p>
+                    <p><strong>Összefüggés:</strong> Számítása pont- vagy ívrugalmassággal. Pozitív: helyettesítő (sör/bor); Negatív: kiegészítő (autó/benzin).</p>
+                    <p><em>Példa:</em> Sör ára 10%-kal nő, bor kereslete 5%-kal nő \( \rightarrow \epsilon = 0,5 \) (helyettesítő).</p>
+                </div>
+
+            </div>
+
+            <h3>Fogalmak</h3>
+			<br>
+            <div class="accordion">
+                
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Szűkösség <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A gazdaság alapvető problémája: a rendelkezésre álló erőforrások (munka, tőke, föld) korlátozottak az emberi szükségletekhez képest.</p>
+                        <p><strong>Összefüggés:</strong> Ez teszi szükségessé a Gazdasági szereplők választásait és optimalizálását. Ez az oka az Alternatív költség létezésének.</p>
+                        <p><em>Példa:</em> Nincs végtelen mennyiségű időd és pénzed, így döntened kell, hogy moziba mész, vagy tankönyvet veszel.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Alternatív költség (Opportunity cost) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Annak a legjobb, de feláldozott (ki nem választott) alternatívának a hozama vagy értéke, amiről le kellett mondanunk a döntésünk miatt.</p>
+                        <p><strong>Összefüggés:</strong> Szorosan kapcsolódik a Gazdasági költséghez és az Implicit költségekhez, hiszen a gazdaságban nem csak a pénzkiadás költség!</p>
+                        <p><em>Példa:</em> Ha a vizsga előtti este elmész bulizni, a buli alternatív költsége az a jobb jegy, amit tanulással szerezhettél volna.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Termelési lehetőségek határa (TLH) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Egy olyan görbe, amely megmutatja két jószág (vagy jószágcsoport) maximálisan megtermelhető kombinációit, adott erőforrások és technológia teljes kihasználása mellett.</p>
+                        <p><strong>Összefüggés:</strong> A TLH-n fekvő összes pont Pareto-hatékony. A görbe meredeksége a Transzformációs ráta.</p>
+                        <p><em>Példa:</em> Egy ország választhat, hogy traktorokat (beruházás) vagy kenyeret (fogyasztás) termel, és a határon mozgás cserearányt mutat.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Pareto-hatékonyság <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan gazdasági állapot, amelyben már senki helyzetén nem lehet javítani anélkül, hogy valaki más helyzete ne romlana.</p>
+                        <p><strong>Összefüggés:</strong> A Tökéletes verseny egyensúlya Pareto-hatékony, míg a Monopólium, a Fogolydilemma és az Externáliák nem (ott van elosztatlan HTV).</p>
+                        <p><em>Példa:</em> Ha egy tortát maradéktalanul szétosztottak a gyerekek között, bárhogyan adsz több szeletet Pistikének, azt csak Józsikától tudod elvenni.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Transzformációs ráta (MRT) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Megmutatja, hogy az egyik termék termelésének egy egységgel történő növelése érdekében mennyit kell feláldozni a másik termék termeléséből.</p>
+                        <p><strong>Összefüggés:</strong> A TLH görbe egy adott pontjában húzott érintő meredeksége.</p>
+                        <p><em>Példa:</em> MRT = 2: 1 db plusz traktor gyártásához 2 tonna búzáról kell lemondania a gazdaságnak.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Homo oeconomicus <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A racionális, önérdekkövető "gazdasági ember" elméleti modellje, aki tökéletesen informált, és célja mindig a saját hasznosságának/profitjának maximalizálása.</p>
+                        <p><strong>Összefüggés:</strong> Ezen a feltételezésen alapul a Profitmaximalizálás (MR=MC) és a Nash-egyensúly felállítása is a játékelméletben.</p>
+                        <p><em>Példa:</em> A fogyasztó azt a terméket veszi meg, ami ugyanannyi pénzért nagyobb elégedettséget nyújt neki.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Gazdasági szereplők <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A gazdaság résztvevői: Háztartások (céljuk a hasznosság maximalizálása, erőforrás-tulajdonosok), Vállalatok (céljuk a profit maximalizálása, termelők), Állam (célja a társadalmi jólét növelése, szabályozó).</p>
+                        <p><strong>Összefüggés:</strong> A háztartások adják a Keresletet a termékpiacon, a vállalatok a Kínálatot.</p>
+                        <p><em>Példa:</em> A család megveszi a kenyeret (háztartás), a pékség megsüti (vállalat), a hatóság ellenőrzi az adót (állam).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Kereslet (Piaci is) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A fogyasztók fizetőképes szükséglete: az a jószágmennyiség, amit a vevők egy adott áron képesek és hajlandóak megvásárolni.</p>
+                        <p><strong>Összefüggés:</strong> Képlete a Keresleti függvény. Piaci szinten az egyéni keresletek horizontális összege. Rugalmasságát az \( \epsilon \) méri.</p>
+                        <p><em>Példa:</em> Pisti venne 2 sört, Anna 1-et. A piaci kereslet 3 sör az adott áron.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Kínálat (Piaci is) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A termelők értékesítési hajlandósága: az a jószágmennyiség, amit a termelők adott áron és feltételek mellett hajlandóak piacra vinni.</p>
+                        <p><strong>Összefüggés:</strong> Képlete a Kínálati függvény. Piaci szinten az egyes cégek MC görbéinek összege (rövid távon).</p>
+                        <p><em>Példa:</em> Egy asztalos 5000 Ft-ért még nem, de 20 000 Ft-ért már szívesen készít egy széket.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Marshall-kereszt <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A keresleti és a kínálati görbe együttes ábrázolása egyetlen koordináta-rendszerben (P-Q tengelyeken).</p>
+                        <p><strong>Összefüggés:</strong> Ennek a metszéspontja adja a Piaci egyensúlyt. Itt látható vizuálisan a Fogyasztói és Termelői többlet.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Túlkereslet (Hiány) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan piaci állapot, amikor az adott áron a keresett mennyiség meghaladja a kínált mennyiséget (\( Q_D > Q_S \)).</p>
+                        <p><strong>Összefüggés:</strong> Akkor jön létre tartósan, ha az állam Árplafont vezet be az egyensúlyi ár alatt. Nyomást gyakorol az árak emelkedésére.</p>
+                        <p><em>Példa:</em> Hatósági áras a benzin (olcsó), ezért sokan tankolnának (nagy \( Q_D \)), de a kutaknak nem éri meg eladni (kicsi \( Q_S \)).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Túlkínálat (Felesleg) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan piaci állapot, amikor az adott áron a kínált mennyiség meghaladja a keresett mennyiséget (\( Q_S > Q_D \)).</p>
+                        <p><strong>Összefüggés:</strong> Akkor jön létre tartósan, ha az állam Árpadlót vezet be az egyensúlyi ár fölött. Nyomást gyakorol az árak csökkenésére.</p>
+                        <p><em>Példa:</em> Minimálbér bevezetése: többen vállalnának munkát (nagy kínálat), de a cégek kevesebb embert tudnak megfizetni (kicsi kereslet).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Bruttó ár<span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A fogyasztó által ténylegesen kifizetett ár, amely már tartalmazza a termék értékét és az állami adót is.</p>
+                        <p><strong>Összefüggés:</strong> Mennyiségi adó képletében: \( p_B = p_N + t \).</p>
+                        <p><em>Példa:</em> A boltban a kenyér árcéduláján lévő összeg.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Nettó ár<span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A termelő (eladó) által ténylegesen megtartott (realizált) ár az adók befizetése után.</p>
+                        <p><strong>Összefüggés:</strong> A bruttó ár és az adó különbsége (\( p_B - t \)).</p>
+                        <p><em>Példa:</em> A pékség bevétele, miután befizette az ÁFÁ-t az államnak.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Árplafon (Maximált ár) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Az állam által rögzített maximális ár, amelynél drágábban tilos adni a terméket. Csak akkor hatékony, ha az egyensúlyi ár alatt van.</p>
+                        <p><strong>Összefüggés:</strong> Kiszámításakor Túlkereslet és Holtteher-veszteség (HTV) keletkezik, a SW csökken.</p>
+                        <p><em>Példa:</em> A kormány rendeletben rögzíti, hogy 1 liter tej nem lehet drágább 250 Ft-nál.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Árpadló (Minimált ár) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Az állam által rögzített minimális ár, amelynél olcsóbban tilos adni a terméket/szolgáltatást. Csak az egyensúlyi ár felett hatékony.</p>
+                        <p><strong>Összefüggés:</strong> Túlkínálatot okoz. Növeli a Termelői többletet az FT rovására, de HTV-t okoz.</p>
+                        <p><em>Példa:</em> Minimálbér, vagy a mezőgazdasági felvásárlási árak állami garantálása.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Rugalmasság (Általános) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A változásokra való érzékenység mérőszáma: megmutatja, hány százalékkal változik az egyik változó (pl. kereslet), ha egy másik változó (pl. ár) egy százalékkal megváltozik.</p>
+                        <p><strong>Összefüggés:</strong> Képletei a Képlet-táblázatban: Sajátár-, Keresztár-, Jövedelem- és Kínálati rugalmasság.</p>
+                        <p><em>Példa:</em> Egy luxusautó kereslete nagyon rugalmas, a sóé rugalmatlan.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Vállalat <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan gazdasági szervezet, amely erőforrásokat vásárol/bérel a piacon, hogy azokkal mások által keresett javakat/szolgáltatásokat állítson elő profit elérése céljából.</p>
+                        <p><strong>Összefüggés:</strong> Célja a Profitmaximalizálás (gazdasági profit elérése), kínálatát az Időtáv határozza meg.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Időtáv a vállalatnál <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Piaci: semmilyen input nem változtatható. Rövid: legalább 1 fix és 1 változó input van. Hosszú: minden input változtatható.</p>
+                        <p><strong>Összefüggés:</strong> A 3. fejezet számításai (TC, FC, VC, MC) a rövid távon mozognak, mert van fix költség (Tőke rögzített).</p>
+                        <p><em>Példa:</em> Rövid távon a pizzéria csak több sajt/tészta vételével növelheti a termelést. Hosszú távon vehet egy új kemencét.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="quiz-btn" onclick="openQuiz('quiz1')">Teszt kitöltése (I. Blokk)</button>
+        </section>
+
+
+        <section id="blokk2" class="section-content">
+            <h2 class="section-title">II. Blokk: Termelés és költségek</h2>
+            <h3>Képletek</h3>
+				<br>
+				<div class="card-grid">
+                
+                <div class="card">
+                    <h4>Termelési függvény</h4>
+                    <div class="formula">$$Q = f(K, L)$$</div>
+                    <p><strong>Mire használjuk:</strong> Az inputok (tőke, munka) és a maximális kibocsátás technikai kapcsolata.</p>
+                    <p><strong>Összefüggés:</strong> Rövid távon K rögzített, így a függvény csak a munkától függ: Q=f(L). Ebből vezetjük le a változó költséget.</p>
+                    <p><em>Példa:</em> \( Q = 40L + 12L^2 - L^3 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Határtermék (\( MP_L \))</h4>
+                    <div class="formula">$$MP_L = \frac{dQ}{dL}$$</div>
+                    <p><strong>Mire használjuk:</strong> Megmutatja, mennyivel nő a termelés egy egységnyi többletmunka hatására.</p>
+                    <p><strong>Összefüggés:</strong> A termelési függvény munka szerinti deriváltja. Ott maximális a Q, ahol \( MP_L = 0 \).</p>
+                    <p><em>Példa:</em> \( Q = 90L - L^2 \rightarrow MP_L = 90 - 2L \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Átlagtermék (\( AP_L \))</h4>
+                    <div class="formula">$$AP_L = \frac{Q}{L}$$</div>
+                    <p><strong>Mire használjuk:</strong> A munka átlagos termelékenységét (egy főre jutó gyártás) méri.</p>
+                    <p><strong>Összefüggés:</strong> Ott éri el a maximumát, ahol metszi a határtermék görbéjét (\( AP_L = MP_L \)).</p>
+                    <p><em>Példa:</em> \( Q=100, L=4 \rightarrow AP_L=25 \) db/fő.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Termelés rugalmassága (\( \epsilon_L \))</h4>
+                    <div class="formula">$$\epsilon_L = \frac{MP_L}{AP_L}$$</div>
+                    <p><strong>Mire használjuk:</strong> A kibocsátás munkaerő-változásra való érzékenysége (parciális rugalmasság).</p>
+                    <p><strong>Összefüggés:</strong> Ahol \( AP_L \) maximális (\( AP_L = MP_L \)), ott a rugalmasság értéke pontosan 1.</p>
+                    <p><em>Példa:</em> Ha \( \epsilon_L = 0,5 \), akkor 10% új munkaerő 5% termelésnövekedést hoz.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Költségfüggvény / Teljes költség 1. (TC)</h4>
+                    <div class="formula">$$TC = FC + VC(Q)$$</div>
+                    <p><strong>Mire használjuk:</strong> A termelés összköltségének felírása a kibocsátás (Q) függvényében.</p>
+                    <p><strong>Összefüggés:</strong> Ezt hívjuk magának a költségfüggvénynek. Ebből deriváljuk a határköltséget (MC).</p>
+                    <p><em>Példa:</em> \( TC = 10\,000 + 120Q^2 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Teljes költség 2. (tényezőárakkal)</h4>
+                    <div class="formula">$$TC = p_L \cdot L + p_K \cdot K$$</div>
+                    <p><strong>Mire használjuk:</strong> A költségek felírása a felhasznált erőforrások és azok árai alapján.</p>
+                    <p><strong>Összefüggés:</strong> Itt a \( p_K \cdot K \) rész adja a fix költséget, a \( p_L \cdot L \) rész pedig a változó költséget.</p>
+                    <p><em>Példa:</em><br> \( p_L=1000, L=10 \) <br> \( p_K=5000, K=2 \) <br> \( \rightarrow TC = 20\,000 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Fix költség (FC)</h4>
+                    <div class="formula">$$FC = p_K \cdot K$$</div>
+                    <p><strong>Mire használjuk:</strong> A termelés (Q) nagyságától független, állandó költségelem.</p>
+                    <p><strong>Összefüggés:</strong> Rövid távon mindig konstans. Akkor is fizetni kell, ha \( Q=0 \).</p>
+                    <p><em>Példa:</em> 50 000 Ft bérleti díj egy hónapra.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Változó költség (VC)</h4>
+                    <div class="formula">$$VC = p_L \cdot L(Q)$$</div>
+                    <p><strong>Mire használjuk:</strong> A gyártott mennyiséggel együtt változó költségek.</p>
+                    <p><strong>Összefüggés:</strong> A munka árának és a kibocsátáshoz szükséges munkának a szorzata.</p>
+                    <p><em>Példa:</em> Nyersanyagok és munkabérek: \( VC = 6,25Q^2 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Határköltség (MC)</h4>
+                    <div class="formula">$$MC = \frac{dTC}{dQ}$$</div>
+                    <p><strong>Mire használjuk:</strong> Egyetlen pótlólagos termékegység előállításának többletköltsége.</p>
+                    <p><strong>Összefüggés:</strong> A Teljes költség (vagy a változó költség) deriváltja. Profitmaximumnál \( P = MC \) vagy \( MR = MC \).</p>
+                    <p><em>Példa:</em> \( TC = 5Q^2 + 10Q + 4500 \rightarrow MC = 10Q + 10 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Átlagköltség (AC)</h4>
+                    <div class="formula">$$AC = \frac{TC}{Q}$$</div>
+                    <p><strong>Mire használjuk:</strong> Az egy megtermelt egységre jutó teljes költség.</p>
+                    <p><strong>Összefüggés:</strong> Minimumpontja a vállalat fedezeti pontja. Ott metszi a határköltség (\( MC=AC \)).</p>
+                    <p><em>Példa:</em> \( TC=1000, Q=10 \rightarrow AC=100 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Átlagos változó költség (AVC)</h4>
+                    <div class="formula">$$AVC = \frac{VC}{Q}$$</div>
+                    <p><strong>Mire használjuk:</strong> Az egy egységre jutó változó ráfordítás.</p>
+                    <p><strong>Összefüggés:</strong> Minimumpontja a vállalat üzemszüneti pontja. Ez alatt nem érdemes termelni.</p>
+                    <p><em>Példa:</em> \( VC=5Q^2 \rightarrow AVC=5Q \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Átlagos fix költség (AFC)</h4>
+                    <div class="formula">$$AFC = \frac{FC}{Q}$$</div>
+                    <p><strong>Mire használjuk:</strong> Az egy egységre jutó állandó költség.</p>
+                    <p><strong>Összefüggés:</strong> Mivel az FC konstans, az AFC a mennyiség (Q) növekedésével folyamatosan csökken (hiperbola).</p>
+                    <p><em>Példa:</em> \( FC=10\,000, Q=100 \rightarrow AFC=100 \).</p>
+                </div>
+
+            </div>
+			
+			<h3>Fogalmak</h3>
+			<br>
+            <div class="accordion">
+                
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Árbevétel (TR) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat összes értékesítéséből származó pénzbevétel (függetlenül a költségektől).</p>
+                        <p><strong>Összefüggés:</strong> Képlete: \( TR = p \cdot Q \). A Gazdasági profit kiszámításának első tagja.</p>
+                        <p><em>Példa:</em> 1000 db eladott könyv 5000 Ft-os áron \(\rightarrow\) 5 millió Ft árbevétel.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Gazdasági költség (TC) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat összes felmerülő ráfordítása a termelés során, alternatív költség alapon értékelve (azaz az elveszett hozamokat is beleértve).</p>
+                        <p><strong>Összefüggés:</strong> Képlete: Explicit költségek + Implicit költségek. Képlet-táblázatban ez a Teljes Költség (TC).</p>
+                        <p><em>Példa:</em> Anyagköltség + bérleti díj + a tulajdonos beletett saját munkájának piaci értéke.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Explicit költségek <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Azonnal és közvetlenül, adott időszakban pénzkifizetéssel járó, bizonylattal (számlával) igazolható költségek.</p>
+                        <p><strong>Összefüggés:</strong> Része mind a Gazdasági, mind a Számviteli költségnek.</p>
+                        <p><em>Példa:</em> Nyersanyagvásárlás, villanyszámla kifizetése, munkavállalók bére.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Implicit költségek <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan ráfordítások, amelyekhez nem kapcsolódik azonnali pénzmozgás, de alternatív költségként felmerülnek (feláldozott, máshol megszerezhető jövedelem).</p>
+                        <p><strong>Összefüggés:</strong> Két része van: Elszámolható és Nem elszámolható. Része a Gazdasági költségnek.</p>
+                        <p><em>Példa:</em> A cégtulajdonos a saját épületét használja irodának ahelyett, hogy kiadná bérbe. A kiesett bérleti díj egy implicit költség.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">(Ebből) Elszámolható implicit költség <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Nincs közvetlen pénzmozgás, de az adójogszabályok (számvitel) alapján költségként levonható a bevételből.</p>
+                        <p><strong>Összefüggés:</strong> Ide tartozik a gépek értékcsökkenése (Amortizáció). Része a Számviteli költségnek.</p>
+                        <p><em>Példa:</em> Egy 10 milliós gép minden évben elveszíti az értéke 20%-át \(\rightarrow\) évente 2 millió Ft amortizáció.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">(Ebből) Nem elszámolható implicit költség <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Tisztán közgazdasági kategória. A cégtulajdonos által a vállalkozásba fektetett saját vagyon vagy saját munka máshol megszerezhető hozama.</p>
+                        <p><strong>Összefüggés:</strong> Ezt hívjuk Normál profitnak is. Ez teszi a különbséget a számviteli és a gazdasági költség között!</p>
+                        <p><em>Példa:</em> A vállalkozó beletett 10 millió Ft saját tőkét. Ha ezt bankba tette volna, 10% kamatot (1 milliót) kapna. Ez a feláldozott kamat nem elszámolható.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Gazdasági profit<span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat tiszta, minden (explicit és implicit) ráfordítás levonása után megmaradó nyeresége.</p>
+                        <p><strong>Összefüggés:</strong> Képlete: TR - Gazdasági költség. Ha értéke = 0, az a fedezeti pont, a cég ekkor realizálja a Normál profitot.</p>
+                        <p><em>Példa:</em> Ha a Gazdasági profit pozitív, az az "extraprofit", ami jelzés az iparágba való belépésre.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Számviteli költség <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat könyvelésében megjelenő összes levonható költség.</p>
+                        <p><strong>Összefüggés:</strong> Képlete: Explicit költségek + Elszámolható implicit költségek (amortizáció). Kisebb, mint a gazdasági költség!</p>
+                        <p><em>Példa:</em> Villanyszámla + Bérköltség + Gépértékcsökkenés.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Számviteli profit <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A cég adózás és osztalékfizetés alapját képező nyeresége.</p>
+                        <p><strong>Összefüggés:</strong> Képlete: Árbevétel - Számviteli költség. (Ez az érték mindig NAGYOBB, mint a gazdasági profit).</p>
+                        <p><em>Példa:</em> A könyvelő év végén kiszámolja, és ebből fizet a cég társasági adót az államnak.</p>
+                    </div>
+                </div>
+
+            </div>
+			
+			<h3 style="text-align: center; margin-top: 40px;">A vállalat bevételeinek és költségeinek szerkezete</h3>
+            <table class="profit-table">
+                <tr>
+                    <td colspan="4" style="font-size: 1.2rem; font-weight: bold;">Árbevétel</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="font-weight: bold;">Gazdasági költség</td>
+                    <td rowspan="3" style="font-weight: bold; font-size: 1.1rem;">Gazdasági profit</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="font-weight: bold;">Explicit<br>költségek</td>
+                    <td colspan="2" style="font-weight: bold;">Implicit költségek</td>
+                </tr>
+                <tr>
+                    <td>Elszámolható<br>implicit költségek<br><em>(Pl. amortizáció, ÉCS)</em></td>
+                    <td>El nem számolható<br>implicit költségek =<br>alternatív költség =<br>normál profit</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-weight: bold; font-size: 1.1rem;">Számviteli költség</td>
+                    <td colspan="2" style="font-weight: bold; font-size: 1.1rem;">Számviteli profit</td>
+                </tr>
+            </table>
+            <button class="quiz-btn" onclick="openQuiz('quiz2')">Teszt kitöltése (II. Blokk)</button>
+        </section>
+
+
+        <section id="blokk3" class="section-content">
+            <h2 class="section-title">III. Blokk: Piaci szerkezetek és piaci kudarcok</h2>
+			<h3>Képletek</h3>
+			<br>
+            <div class="card-grid">
+                
+                <div class="card">
+                    <h4>Magánjavak kereslete</h4>
+                    <div class="formula">$$Q = \sum q_i(p)$$</div>
+                    <p><strong>Mire használjuk:</strong> A teljes piaci kereslet meghatározása magánjavaknál.</p>
+                    <p><strong>Összefüggés:</strong> Horizontális összegzés: ugyanazon az áron adjuk össze a különböző személyek által megvett mennyiségeket.</p>
+                    <p><em>Példa:</em> Ármin venne 5 db-ot, Buda 3 db-ot adott áron \( \rightarrow Q_{piaci} = 8 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Közjavak kereslete</h4>
+                    <div class="formula">$$P = \sum p_i(Q)$$</div>
+                    <p><strong>Mire használjuk:</strong> A társadalmi határhaszon (kereslet) meghatározása közjavaknál.</p>
+                    <p><strong>Összefüggés:</strong> Vertikális összegzés: ugyanarra a mennyiségre (Q) adjuk össze a személyek fizetési hajlandóságát.</p>
+                    <p><em>Példa:</em> Ugyanarra az útra Ármin adna 100 Ft-ot, Buda 200 Ft-ot \( \rightarrow P_{piaci} = 300 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Teljes bevétel (TR)</h4>
+                    <div class="formula">$$TR = p \cdot Q$$</div>
+                    <p><strong>Mire használjuk:</strong> A vállalat összes értékesítésből származó bevétele.</p>
+                    <p><strong>Összefüggés:</strong> Tökéletes versenyben a \( p \) fix, monopóliumnál a \( p \) a \( Q \) függvénye \( p(Q) \), így a TR egy másodfokú görbe lesz.</p>
+                    <p><em>Példa:</em> \( p=10, Q=100 \rightarrow TR=1000 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Monopólium határbevétele</h4>
+                    <div class="formula">$$MR = a - 2bQ$$</div>
+                    <p><strong>Mire használjuk:</strong> Megmutatja, mennyivel nő a monopólium bevétele +1 darab eladásakor.</p>
+                    <p><strong>Összefüggés:</strong> Ha a lineáris kereslet \( p = a - bQ \), az MR görbe ugyanabból a pontból indul, de kétszer olyan meredek. Mindig \( MR < p \).</p>
+                    <p><em>Példa:</em> Ha \( p=100-Q \), akkor \( MR=100-2Q \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Egy termékre jutó profit (\( A\pi \))</h4>
+                    <div class="formula">$$A\pi = p - AC$$</div>
+                    <p><strong>Mire használjuk:</strong> Az egyetlen eladott egységen realizált tiszta haszon.</p>
+                    <p><strong>Összefüggés:</strong> Ha \( p > AC \), a vállalat gazdasági profitot ér el. Fedezeti pontban \( p = AC \), így \( A\pi = 0 \).</p>
+                    <p><em>Példa:</em> Az ár 150, egy darab költsége 120 \( \rightarrow A\pi = 30 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Gazdasági profit 1. (\( \pi \))</h4>
+                    <div class="formula">$$\pi = TR - TC$$</div>
+                    <p><strong>Mire használjuk:</strong> A vállalat tényleges gazdasági sikeressége (a normál profit felett).</p>
+                    <p><strong>Összefüggés:</strong> Ez az alapképlet. Akkor maximális a profit, ha \( MR = MC \).</p>
+                    <p><em>Példa:</em> Bevétel 5000, költség 4000 \( \rightarrow \pi=1000 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Gazdasági profit 2. (\( \pi \))</h4>
+                    <div class="formula">$$\pi = (p - AC) \cdot Q$$</div>
+                    <p><strong>Mire használjuk:</strong> A profit felírása az átlagos nyereség és a mennyiség szorzataként.</p>
+                    <p><strong>Összefüggés:</strong> Grafikonon ez egy téglalap területe a \( p \) és az AC között a Q mennyiségnél.</p>
+                    <p><em>Példa:</em> Egy terméken a haszon 20, eladtak belőle 50-et \( \rightarrow \pi=1000 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Haszonkulcs (Markup)</h4>
+                    <div class="formula">$$p - MC$$</div>
+                    <p><strong>Mire használjuk:</strong> Megmutatja, a vállalat mennyivel képes a határköltsége fölé árazni.</p>
+                    <p><strong>Összefüggés:</strong> A piaci hatalom közvetlen mérőszáma. Tökéletes versenyben értéke nulla (\( p=MC \)).</p>
+                    <p><em>Példa:</em> Monopolár 1450, MC 1200 \( \rightarrow \) a haszonkulcs 250.</p>
+                </div>
+
+                <div class="card">
+                    <h4>HTV Monopóliumnál</h4>
+                    <div class="formula">$$HTV = \frac{(p_M - MC) \cdot (Q_{TV} - Q_M)}{2}$$</div>
+                    <p><strong>Mire használjuk:</strong> A monopólium alacsonyabb termelése miatti társadalmi veszteség.</p>
+                    <p><strong>Összefüggés:</strong> A keresleti görbe és a határköltség görbe közötti háromszög az elmaradt forgalomra vetítve.</p>
+                    <p><em>Példa:</em> Sörös példa (9/d feladat): HTV = 12 500.</p>
+                </div>
+
+                <div class="card">
+                    <h4>Társadalmi határköltség (MSC)</h4>
+                    <div class="formula">$$MSC = MC + MEC$$</div>
+                    <p><strong>Mire használjuk:</strong> Egy termék előállításának összes (magán + externális) költsége.</p>
+                    <p><strong>Összefüggés:</strong> Negatív externália esetén az MSC feljebb tolódik az MC-nél, ami társadalmi túltermeléshez vezet.</p>
+                    <p><em>Példa:</em> Gyárnak 10 a költség, füstkár +5 \( \rightarrow MSC=15 \).</p>
+                </div>
+
+                <div class="card">
+                    <h4>Társadalmi határhaszon (MSB)</h4>
+                    <div class="formula">$$MSB = MB + MEB$$</div>
+                    <p><strong>Mire használjuk:</strong> Egy termék fogyasztásának összes (magán + externális) haszna.</p>
+                    <p><strong>Összefüggés:</strong> Pozitív externália esetén az MSB magasabban fut, mint az egyéni kereslet (MB), ami alultermelést okoz.</p>
+                    <p><em>Példa:</em> Oltás egyéni értéke 10, közösség védelme +5 \( \rightarrow MSB=15 \).</p>
+                </div>
+
+            </div>
+			<h3>Fogalmak</h3>
+			<br>
+            <div class="accordion">
+                
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Profitmaximalizálás <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat alapvető célja, hogy megtalálja azt a termelési szintet (\( Q^* \)), ahol a profitja a legnagyobb.</p>
+                        <p><strong>Összefüggés:</strong> A döntés matematikai feltétele mindig: \( MR = MC \) (a határbevétel megegyezik a határköltséggel).</p>
+                        <p><em>Példa:</em> Ha egy asztal 10 000 Ft-ot hoz (MR) és 9 000-be kerül (MC), az asztalos megcsinálja. Ha 11 000-be kerülne (MC), leáll.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Árelfogadó magatartás <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat önmaga képtelen befolyásolni a piaci árat, bármennyit termel is. Keresleti görbéje egy vízszintes vonal (végtelen rugalmasság).</p>
+                        <p><strong>Összefüggés:</strong> Jellemző a Tökéletes versenyre. Ebben a helyzetben a határbevétel fix: \( P = MR \).</p>
+                        <p><em>Példa:</em> Búzatermelő gazda: a világpiaci ár 60 000 Ft/t, ha 1 forinttal drágábban adja, senki nem vesz tőle.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Ármeghatározó magatartás <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A vállalat képes befolyásolni az árat: ha növeli az eladásait, csökkentenie kell az árat (negatív meredekségű keresleti görbével szembesül).</p>
+                        <p><strong>Összefüggés:</strong> Jellemző a Monopóliumra, Oligopóliumra és a Monopolisztikus versenyre. Itt \( MR < P \).</p>
+                        <p><em>Példa:</em> Az Apple dönthet úgy, hogy drágábban adja az iPhone-t; ekkor kevesebbet fognak venni belőle, de nem tűnnek el a vevői.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Tökéletes verseny <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Piaci szerkezet: sok apró eladó és vevő, homogén (egyforma) termékek, tökéletes információ, nincs belépési/kilépési korlát.</p>
+                        <p><strong>Összefüggés:</strong> A cég árelfogadó. Az optimális termelésnél \( P = MC \). Hosszú távon a gazdasági profit nulla.</p>
+                        <p><em>Példa:</em> Részvénypiacok vagy a tőzsdei mezőgazdasági termények piaca (búza, kukorica) áll ehhez a legközelebb.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Fedezeti pont <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Az a piaci ár, amelynél a vállalat bevétele pontosan fedezi a teljes gazdasági költségét (Gazdasági Profit = 0).</p>
+                        <p><strong>Összefüggés:</strong> Ott található, ahol a határköltség (MC) metszi az átlagköltséget (AC). \( P = AC_{min} \).</p>
+                        <p><em>Példa:</em> Ha egy lángos átlagos költsége 500 Ft (a fix költségekkel együtt!), és a piacon 500 Ft-ért tudja adni, a cég fedezetben van.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Üzemszüneti pont <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Az a piaci ár, amely már csak a változó költségeket fedezi, a fix költségeket nem.</p>
+                        <p><strong>Összefüggés:</strong> Ahol az MC metszi az átlagos változó költséget (AVC). \( P = AVC_{min} \). Ez alatt a termelést be kell fejezni!</p>
+                        <p><em>Példa:</em> Ha a lángoshoz az anyag és a bér 300 Ft (AVC), de a piacon csak 250 Ft-ot adnak érte, azonnal be kell zárni a bódét.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Versenyző vállalat kínálati magatartása <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Megmutatja, milyen áron mennyit visz piacra a tökéletesen versenyző cég.</p>
+                        <p><strong>Összefüggés:</strong> A vállalat egyéni kínálati görbéje megegyezik a határköltség (MC) görbéjének az üzemszüneti pont feletti szakaszával.</p>
+                        <p><em>Példa:</em> Amíg az ár \( P > AVC_{min} \), a cég a \( P=MC \) vonal mentén növeli a termelését.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Versenyző iparág kínálata hosszú távon <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Mivel hosszú távon a vállalatok szabadon léphetnek be és ki, a piac alkalmazkodik.</p>
+                        <p><strong>Összefüggés:</strong> Ha a piacon extraprofit van, új cégek jönnek \( \rightarrow \) az árak addig csökkennek, amíg mindenki a fedezeti pontba kerül (\( P = AC_{min} \), profit=0).</p>
+                        <p><em>Példa:</em> Divatba jön a kézműves sör \( \rightarrow \) sok új főzde nyílik \( \rightarrow \) az árak lemennek, eltűnik a kezdeti extra nyereség.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Optimális termelés <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A profitmaximalizáló mennyiség megtalálása. Feltétele piactól függetlenül \( MR=MC \).</p>
+                        <p><strong>Összefüggés:</strong> Versenyzőnél \( P=MC \). Monopóliumnál \( P > MC \). Ha ez eltér a társadalmi optimumtól, ott HTV keletkezik.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Monopólium <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Piaci szerkezet, ahol egyetlen vállalat szolgálja ki a teljes piacot, a terméknek nincs közeli helyettesítője, és magasak a piacra lépési korlátok.</p>
+                        <p><strong>Összefüggés:</strong> A vállalat ármeghatározó. Az MR görbe meredeksége 2x a keresletének.</p>
+                        <p><em>Példa:</em> MÁV vagy az egyetlen áramszolgáltató egy adott régióban.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Monopólium jóléti költsége <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A monopólium alacsonyabb mennyiséget termel és magasabb áron adja el, mint a versenyző piac.</p>
+                        <p><strong>Összefüggés:</strong> Emiatt Holtteher-veszteség (HTV) alakul ki: a társadalom veszít.</p>
+                        <p><em>Példa:</em> A vasúti jegy drága, sokan inkább otthon maradnak, pedig a vonat üresen megy (elmaradt hasznos utazás).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Monopólium rövid és hosszú távon <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Rövid távon a monopólium lehet veszteséges is (ha \( P < AC \)). Hosszú távon fennmarad az extraprofitja a belépési korlátok miatt.</p>
+                        <p><strong>Összefüggés:</strong> Míg tökéletes versenyben a profit eltűnik, itt a monopólium meg tudja tartani.</p>
+                        <p><em>Példa:</em> Egy szabadalommal védett gyógyszer gyártója 20 évig biztonságban van a versenytársaktól, megtartja az extraprofitot.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Egyéni optimum <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A gazdasági szereplő saját költségeit és hasznát veszi figyelembe a döntésnél: Magán Határhaszon = Magán Határköltség (\( MB = MC \)).</p>
+                        <p><strong>Összefüggés:</strong> Externália esetén ez eltér a társadalmi optimumtól!</p>
+                        <p><em>Példa:</em> A gyár csak a szén és a munkaerő árát fizeti ki, a füstét nem.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Társadalmi optimum <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Az a pont, ahol az erőforrások elosztása társadalmi szinten a leghatékonyabb: \( MSB = MSC \).</p>
+                        <p><strong>Összefüggés:</strong> Ha a piac magára hagyva nem ezt az eredményt hozza, azt hívjuk Piaci kudarcnak (ideális beavatkozás pl. a Pigou-adó).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Monopolisztikus verseny <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Piaci szerkezet: sok eladó, de a termékek nem egyformák (differenciáltak). Nincs belépési korlát.</p>
+                        <p><strong>Összefüggés:</strong> A differenciálás miatt a cégek enyhe ármeghatározók (saját arculatuk, márkájuk miatt lejt a keresleti görbéjük).</p>
+                        <p><em>Példa:</em> Fodrászatok, éttermek, ruhamárkák. Sok van, de mindegyik kicsit más.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Monopolisztikus verseny rövid és hosszú távon <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Rövid távon monopolként viselkedik. Hosszú távon az extraprofit új cégeket vonz \( \rightarrow \) a kereslet csökken \( \rightarrow \) a profit eltűnik.</p>
+                        <p><strong>Összefüggés:</strong> Hosszú távon nem az AC minimumában termel (kihasználatlan kapacitás!).</p>
+                        <p><em>Példa:</em> Nyitsz egy szuper hamburgerezőt, degeszre keresed magad. Aztán a szomszédban is nyílik három, a profitod normál szintre olvad.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Oligopólium <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Piaci szerkezet, ahol csak néhány nagy vállalat uralja a piacot, komoly belépési korlátokkal.</p>
+                        <p><strong>Összefüggés:</strong> Legfontosabb eleme a stratégiai kölcsönhatás (játékelmélettel elemezzük).</p>
+                        <p><em>Példa:</em> Mobiltelefon-szolgáltatók (Telekom, Yettel, Vodafone).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Kifizetési mátrix <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A játékelmélet táblázatos eszköze, amely megmutatja a játékosok összes lehetséges stratégia-kombinációjához tartozó kifizetéseket (profitokat).</p>
+                        <p><strong>Összefüggés:</strong> Ebből keressük ki a Domináns stratégiát és a Nash-egyensúlyt.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Nash-egyensúly <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan állapot a játékelméletben, ahonnan egyik játékosnak sem származik előnye abból, ha egyoldalúan megváltoztatja a saját lépését.</p>
+                        <p><strong>Összefüggés:</strong> A mátrix stabil pontja, de nem feltétlenül Pareto-hatékony.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Fogolydilemma <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan konfliktushelyzet az oligopol piacon, ahol mindkét félnek van domináns stratégiája, ami elvezet a Nash-egyensúlyba.</p>
+                        <p><strong>Összefüggés:</strong> A kialakult egyensúly nem Pareto-hatékony (mindketten jobban jártak volna kooperációval).</p>
+                        <p><em>Példa:</em> Duopólium esetén mindkettő bepánikol és alacsony árat szab, így mindkettőnek kicsi lesz a profitja.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Externália (Külső gazdasági hatás) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Akkor jelentkezik, ha egy szereplő tevékenysége piaci ellentételezés (pénzmozgás) nélkül befolyásolja egy másik szereplő jólétét.</p>
+                        <p><strong>Összefüggés:</strong> Lehet pozitív (MSB > MB) vagy negatív (MSC > MC). Piaci kudarcot okoz.</p>
+                        <p><em>Példa:</em> Füstöt eregető gyár, ami rontja a panzió forgalmát (Negatív termelői).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Közjószág <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Olyan jószág, amelynek fogyasztása során nincs rivalizálás, és a fogyasztásból senkit nem lehet kizárni.</p>
+                        <p><strong>Összefüggés:</strong> Piaci keresletét a vertikális összegzéssel kapjuk meg.</p>
+                        <p><em>Példa:</em> Utcai közvilágítás, országos honvédelem.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Magán-, vegyes- és közjavak <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> Osztályozás kizárhatóság és rivalizálás alapján. Tiszta magán: van mindkettő. Közös forrás: nincs kizárás, van rivalizálás. Díjköteles: van kizárás, nincs rivalizálás. Közjószág: egyik sincs.</p>
+                        <p><em>Példa:</em> Magán: Kifli. Közös forrás: Halak a tengeren. Díjköteles: Üres autópálya. Tiszta köz: Világítótorony.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">Potyázás problémája (Free-rider problem) <span>+</span></button>
+                    <div class="accordion-content">
+                        <p><strong>Definíció:</strong> A közjavak finanszírozásának fő buktatója: racionális egyéni stratégia, hogy ne fizessünk érte, hanem várjuk meg, amíg valaki más kifizeti.</p>
+                        <p><strong>Összefüggés:</strong> Nash-egyensúlya, hogy senki nem fizet, és a jószág létre sem jön. Ezért kell államilag finanszírozni.</p>
+                        <p><em>Példa:</em> Csoportmunkánál az a csapattag, aki semmit nem dolgozik, de megkapja az ötöst.</p>
+                    </div>
+                </div>
+
+            </div>
+            
+            <br>
+            <button class="quiz-btn" onclick="openQuiz('quiz3')">Teszt kitöltése (III. Blokk)</button>
+        </section>
+
+    </main>
+
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tudáspróba - I. Blokk</h2>
+                <button class="close-modal" onclick="closeQuiz()">&times;</button>
+            </div>
+            <div id="quizContainer">
+                
+                <div id="questionsDiv"></div>
+                
+                <button class="quiz-submit" onclick="evaluateQuiz()">Eredmények kiértékelése</button>
+                <h3 id="quizScore" style="margin-top: 20px;"></h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Oldal/Szekció váltás
+        function showSection(sectionId) {
+            document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Harmonika (Fogalmak) lenyitása/becsukása
+        function toggleAccordion(button) {
+            const item = button.parentElement;
+            item.classList.toggle('active');
+            const span = button.querySelector('span');
+            span.textContent = item.classList.contains('active') ? '-' : '+';
+        }
+
+        // ==========================================
+        // KVÍZ ADATBÁZIS (5 db, egyenként 3 kérdéses teszt)
+        // ==========================================
+        const block1Quizzes = [
+            [ // 1. Teszt
+                {
+                    question: "1. Mit jelent a rezervációs ár a fogyasztó szempontjából?",
+                    answers: { a: "Azt a minimális árat, amennyiért eladja a terméket.", b: "Azt a maximális árat, amit még éppen hajlandó kifizetni.", c: "A hatósági árat, amit az állam szab meg." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Hogyan számoljuk az adó nélküli piaci egyensúlyt?",
+                    answers: { a: "Qd = Qs (Kereslet egyenlő a kínálattal)", b: "MC = MR (Határköltség egyenlő a határbevétellel)", c: "pB = pN + t (Bruttó ár egyenlő nettó plusz adó)" },
+                    correct: "a"
+                },
+                {
+                    question: "3. Mi az alternatív költség?",
+                    answers: { a: "A számlával igazolható pénzkiadás.", b: "A könyvelésben megjelenő amortizáció.", c: "A feláldozott, legjobb alternatíva elmaradt hozama." },
+                    correct: "c"
+                }
+            ],
+            [ // 2. Teszt
+                {
+                    question: "1. Mit mutat meg a transzformációs ráta (MRT)?",
+                    answers: { a: "Egy termék termelésének növelése miatt feláldozott másik termék mennyiségét.", b: "Azzal az aránnyal, ahogy a vállalat a profitját növeli.", c: "Az adókulcs százalékos értékét a bruttó árból." },
+                    correct: "a"
+                },
+                {
+                    question: "2. Milyen piaci állapotot okoz egy, az egyensúlyi ár fölött rögzített árpadló (minimált ár)?",
+                    answers: { a: "Túlkeresletet (hiányt).", b: "Túlkínálatot (felesleget).", c: "Tökéletes piaci egyensúlyt." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Hogyan reagál a kereslet, ha a sajátár-rugalmasság abszolút értéke nagyobb, mint 1 (vagyis rugalmas)?",
+                    answers: { a: "Az áremelés növeli a vállalat teljes bevételét.", b: "Az árcsökkentés növeli a vállalat teljes bevételét.", c: "Az árváltozás nincs hatással a bevételre." },
+                    correct: "b"
+                }
+            ],
+            [ // 3. Teszt
+                {
+                    question: "1. Mikor beszélünk Pareto-hatékony állapotról?",
+                    answers: { a: "Ha a vállalat elérte a profitmaximumát az MR=MC pontban.", b: "Ha már senki helyzetén nem lehet javítani valaki más helyzetének romlása nélkül.", c: "Ha az állam maximalizálja a beszedett adóbevételt." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Mi a holtteher-veszteség (HTV) jelentése adóztatás esetén?",
+                    answers: { a: "Az eladók és vevők által befizetett teljes adóösszeg (T).", b: "A társadalom tiszta vesztesége az adó miatt elmaradt tranzakciókból.", c: "A termelői többlet növekedése a fogyasztói többlet rovására." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Milyen jószágra utal, ha a jövedelemrugalmassága negatív?",
+                    answers: { a: "Luxus jószágra.", b: "Alapvető (normál) jószágra.", c: "Inferior (alsóbbrendű) jószágra." },
+                    correct: "c"
+                }
+            ],
+            [ // 4. Teszt
+                {
+                    question: "1. Mit jelent a homo oeconomicus fogalma?",
+                    answers: { a: "A racionális, önérdekkövető, hasznosság- vagy profitmaximalizáló ember modellje.", b: "Az az ember, aki mindig a közösségi jólétet helyezi előtérbe.", c: "Az állam, mint a gazdaságot szabályozó legfelsőbb szereplő." },
+                    correct: "a"
+                },
+                {
+                    question: "2. Ha két termék keresztár-rugalmassága pozitív (pl. sör és bor), akkor a két termék...",
+                    answers: { a: "Egymás kiegészítői.", b: "Egymás helyettesítői.", c: "Teljesen függetlenek egymástól." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Miből tevődik össze az adó nélküli társadalmi jólét (SW)?",
+                    answers: { a: "Kizárólag a fogyasztói többletből.", b: "Az állam adóbevételéből és a vállalatok profitjából.", c: "A fogyasztói többlet és a termelői többlet összegéből." },
+                    correct: "c"
+                }
+            ],
+            [ // 5. Teszt
+                {
+                    question: "1. Mi a különbség a bruttó és a nettó ár között mennyiségi adó esetén?",
+                    answers: { a: "A bruttó ár a fogyasztó által fizetett ár, a nettó ár az eladónál maradó összeg az adó után.", b: "A nettó ár tartalmazza az adót, a bruttó ár pedig az eredeti termelési költség.", c: "Nincs különbség, csak a számvitelben hívják másképp." },
+                    correct: "a"
+                },
+                {
+                    question: "2. Mit jelent a szűkösség a közgazdaságtanban?",
+                    answers: { a: "Azt, hogy az államnak nincs elég bevétele a kiadások fedezésére.", b: "Azt, hogy egy vállalat épp az üzemszüneti pont alatt termel.", c: "Azt, hogy a rendelkezésre álló erőforrások korlátozottak az emberi szükségletekhez képest." },
+                    correct: "c"
+                },
+                {
+                    question: "3. Melyik képlettel számítjuk az értékadót (pl. ÁFA)?",
+                    answers: { a: "pB = pN + t", b: "pB = pN * (1 + τ)", c: "pB = pN / τ" },
+                    correct: "b"
+                }
+            ]
+        ];
+
+		// ==========================================
+        // II. BLOKK KVÍZ ADATBÁZIS (5x3 kérdés)
+        // ==========================================
+        const block2Quizzes = [
+            [ // 1. Teszt
+                {
+                    question: "1. Mi a különbség a gazdasági és a számviteli költség között?",
+                    answers: { a: "A gazdasági költség az adókkal növelt számviteli költség.", b: "A gazdasági költség tartalmazza a nem elszámolható implicit költségeket is.", c: "A számviteli költség mindig nagyobb, mert benne van az amortizáció." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Hol található a vállalat üzemszüneti pontja?",
+                    answers: { a: "Ahol az ár egyenlő a határköltséggel (P = MC).", b: "Az átlagköltség minimumában (P = AC min).", c: "Az átlagos változó költség minimumában (P = AVC min)." },
+                    correct: "c"
+                },
+                {
+                    question: "3. Milyen kapcsolat van az átlagtermék (AP) és a határtermék (MP) között ott, ahol az átlagtermék maximális?",
+                    answers: { a: "A határtermék nulla (MP = 0).", b: "A határtermék megegyezik az átlagtermékkel (MP = AP).", c: "A határtermék is maximális." },
+                    correct: "b"
+                }
+            ],
+            [ // 2. Teszt
+                {
+                    question: "1. Mit jelent a normál profit?",
+                    answers: { a: "A vállalat adózott eredményét a számvitel szerint.", b: "A vállalkozó saját munkájának és tőkéjének feláldozott hozamát (el nem számolható implicit költség).", c: "Az árbevétel és az explicit költségek különbözetét." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Hogyan viselkedik az átlagos fix költség (AFC) a termelés (Q) növelésével?",
+                    answers: { a: "Folyamatosan csökken.", b: "U alakú görbét ír le.", c: "Vízszintes egyenes, mert a fix költség nem változik." },
+                    correct: "a"
+                },
+                {
+                    question: "3. Melyik tényező rögzített (nem változtatható) rövid távon a vállalat számára?",
+                    answers: { a: "A munka (L).", b: "A nyersanyag mennyisége.", c: "A tőke (K)." },
+                    correct: "c"
+                }
+            ],
+            [ // 3. Teszt
+                {
+                    question: "1. Egy vállalat árbevétele 10.000 Ft, explicit költsége 5.000 Ft, implicit költsége 3.000 Ft. Mekkora a számviteli profit (ha nincs amortizáció)?",
+                    answers: { a: "5.000 Ft", b: "2.000 Ft", c: "8.000 Ft" },
+                    correct: "a"
+                },
+                {
+                    question: "2. Mit mutat meg a határköltség (MC)?",
+                    answers: { a: "Egy egységre jutó összes költséget.", b: "Egyetlen pótlólagos termék előállításának többletköltségét.", c: "A fix költségek arányát a teljes költségen belül." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Mi a munka parciális rugalmasságának értéke, amikor az átlagtermék (AP) maximális?",
+                    answers: { a: "Pontosan 0.", b: "Pontosan 1.", c: "Végtelen." },
+                    correct: "b"
+                }
+            ],
+            [ // 4. Teszt
+                {
+                    question: "1. Mikor ér el a vállalat gazdasági extraprofitot?",
+                    answers: { a: "Ha az ár meghaladja az átlagköltséget (P > AC).", b: "Ha a bevétele fedezi a változó költségeket.", c: "Ha a határköltség nulla." },
+                    correct: "a"
+                },
+                {
+                    question: "2. Miből áll a teljes költség (TC) rövid távon?",
+                    answers: { a: "Határköltség (MC) + Változó költség (VC).", b: "Átlagköltség (AC) + Fix költség (FC).", c: "Fix költség (FC) + Változó költség (VC)." },
+                    correct: "c"
+                },
+                {
+                    question: "3. Mi a feltétele a profitmaximalizáló termelési szintnek?",
+                    answers: { a: "Ahol a határbevétel egyenlő a határköltséggel (MR = MC).", b: "Ahol az átlagköltség a legkisebb.", c: "Ahol a vállalat a legtöbb darabot tudja legyártani." },
+                    correct: "a"
+                }
+            ],
+            [ // 5. Teszt
+                {
+                    question: "1. Melyik költségtípusba tartozik a gépek értékcsökkenése (amortizációja)?",
+                    answers: { a: "Explicit költség.", b: "Elszámolható implicit költség.", c: "Nem elszámolható implicit költség." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Melyik görbét metszi az MC (határköltség) görbe a legalsó pontjában (minimumában)?",
+                    answers: { a: "Csak az AC (átlagköltség) görbét.", b: "Csak az AFC (átlagos fix költség) görbét.", c: "Mind az AC, mind az AVC (átlagos változó költség) görbéket." },
+                    correct: "c"
+                },
+                {
+                    question: "3. A gazdasági profithoz képest a számviteli profit értéke...",
+                    answers: { a: "Mindig nagyobb (vagy egyenlő).", b: "Mindig kisebb.", c: "A kettő mindig pontosan megegyezik." },
+                    correct: "a"
+                }
+            ]
+        ];
+
+		// ==========================================
+        // III. BLOKK KVÍZ ADATBÁZIS (5x3 kérdés)
+        // ==========================================
+        const block3Quizzes = [
+            [ // 1. Teszt: Piaci szerkezetek alapjai
+                {
+                    question: "1. Mi a profitmaximalizálás általános feltétele bármely piaci szerkezetben?",
+                    answers: { a: "P = AC (Ár egyenlő az átlagköltséggel)", b: "MR = MC (Határbevétel egyenlő a határköltséggel)", c: "P = AVC (Ár egyenlő az átlagos változó költséggel)" },
+                    correct: "b"
+                },
+                {
+                    question: "2. Hogyan viszonyul a határbevétel (MR) az árhoz (P) egy monopólium esetén?",
+                    answers: { a: "MR mindig kisebb, mint az ár (MR < P).", b: "MR mindig egyenlő az árral (MR = P).", c: "MR mindig nagyobb, mint az ár (MR > P)." },
+                    correct: "a"
+                },
+                {
+                    question: "3. Mikor van egy vállalat a fedezeti pontjában?",
+                    answers: { a: "Ha az ár megegyezik a határköltséggel.", b: "Ha az ár megegyezik az átlagköltség minimumával (P = AC min).", c: "Ha a határbevétel nulla." },
+                    correct: "b"
+                }
+            ],
+            [ // 2. Teszt: Játékelmélet
+                {
+                    question: "1. Mit jelent a Nash-egyensúly?",
+                    answers: { a: "Egy olyan állapotot, ahol mindenki a maximális közösségi jólétet kapja.", b: "Olyan állapotot, ahonnan egyik játékosnak sem érdemes egyoldalúan elmozdulnia.", c: "Azt a pontot, ahol a vállalatok felosztják egymás között a piacot." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Mi a fogolydilemma fő tanulsága?",
+                    answers: { a: "A játékosok mindig kooperálnak a nagyobb profit érdekében.", b: "Az egyéni racionalitás (önérdek) nem Pareto-hatékony egyensúlyhoz vezethet.", c: "Csak a monopóliumok képesek elkerülni a veszteségeket." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Mire szolgál a kifizetési mátrix?",
+                    answers: { a: "A vállalat költségeinek részletes vezetésére.", b: "A stratégiai interakciók és a hozzájuk tartozó eredmények ábrázolására.", c: "Az állami adóbevételek kiszámítására." },
+                    correct: "b"
+                }
+            ],
+            [ // 3. Teszt: Externáliák és Közjavak
+                {
+                    question: "1. Milyen piaci kudarcot okoz a negatív externália (pl. környezetszennyezés)?",
+                    answers: { a: "Alultermelést (kevesebb készül, mint ami optimális lenne).", b: "Túltermelést (több készül, mint ami társadalmilag optimális lenne).", c: "Tökéletes piaci egyensúlyt." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Mi jellemző a tiszta közjavakra (pl. közvilágítás)?",
+                    answers: { a: "Rivalizáló a fogyasztásuk és bárki kizárható belőle.", b: "Nincs rivalizálás a fogyasztásban és senki nem zárható ki belőle.", c: "Csak az veheti igénybe, aki kifizeti a piaci árát." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Hogyan határozzuk meg a közjavak piaci keresleti görbéjét?",
+                    answers: { a: "A mennyiségek horizontális (vízszintes) összegzésével.", b: "A fizetési hajlandóságok vertikális (függőleges) összegzésével.", c: "A határköltség görbék átlagolásával." },
+                    correct: "b"
+                }
+            ],
+            [ // 4. Teszt: Verseny és Monopólium különbségek
+                {
+                    question: "1. Mekkora a tökéletesen versenyző iparág gazdasági profitja hosszú távon?",
+                    answers: { a: "Mindig pozitív (extraprofit).", b: "Pontosan nulla (csak normál profit van).", c: "Mindig negatív (veszteséges)." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Mi a holtteher-veszteség (HTV) a monopóliumnál?",
+                    answers: { a: "A monopólium által befizetett társasági adó.", b: "A magas ár és alacsonyabb mennyiség miatti elmaradt társadalmi jólét.", c: "A vállalat marketing költségeinek összege." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Mit jelent az árelfogadó magatartás?",
+                    answers: { a: "A vállalat maga szabja meg az árat a piacon.", b: "A vállalat a piaci árat adottságnak veszi, nem tudja befolyásolni.", c: "A fogyasztók nem alkudozhatnak a boltban." },
+                    correct: "b"
+                }
+            ],
+            [ // 5. Teszt: Haladó fogalmak
+                {
+                    question: "1. Mi jellemző a monopolisztikus versenyre hosszú távon?",
+                    answers: { a: "A cégek extraprofitot realizálnak és az AC minimumában termelnek.", b: "A profit eltűnik, de a cégek kihasználatlan kapacitással (nem az AC minimumában) termelnek.", c: "Csak egyetlen eladó marad a piacon." },
+                    correct: "b"
+                },
+                {
+                    question: "2. Mit mér a haszonkulcs (markup)?",
+                    answers: { a: "Az árbevétel és a fix költség különbségét.", b: "Azt, hogy a vállalat mennyivel áraz a határköltsége fölé (P - MC).", c: "Az állam által kivetett értékadó mértékét." },
+                    correct: "b"
+                },
+                {
+                    question: "3. Mi a potyázás (free-riding) jelensége?",
+                    answers: { a: "Amikor valaki jegy nélkül utazik a vonaton.", b: "Amikor valaki élvezi a közjószág hasznát anélkül, hogy hozzájárulna a költségekhez.", c: "Amikor egy vállalat engedély nélkül használ egy szabadalmat." },
+                    correct: "b"
+                }
+            ]
+        ];
+
+        // ==========================================
+        // KVÍZ LOGIKA (Most már 3 blokkhoz)
+        // ==========================================
+        const modal = document.getElementById('quizModal');
+        let currentQuizId = ''; 
+        
+        function openQuiz(quizId) {
+            currentQuizId = quizId;
+            modal.style.display = 'flex';
+            document.getElementById('quizScore').innerText = "";
+            
+            // Címsor cseréje
+            const modalTitle = document.querySelector('.modal-header h2');
+            if (quizId === 'quiz1') modalTitle.innerText = "Tudáspróba - I. Blokk";
+            if (quizId === 'quiz2') modalTitle.innerText = "Tudáspróba - II. Blokk";
+            if (quizId === 'quiz3') modalTitle.innerText = "Tudáspróba - III. Blokk";
+            
+            const qDiv = document.getElementById('questionsDiv');
+            qDiv.innerHTML = ""; 
+
+            // Adatbázis kiválasztása
+            let quizDatabase;
+            if (quizId === 'quiz1') quizDatabase = block1Quizzes;
+            else if (quizId === 'quiz2') quizDatabase = block2Quizzes;
+            else if (quizId === 'quiz3') quizDatabase = block3Quizzes;
+
+            const randomIndex = Math.floor(Math.random() * quizDatabase.length);
+            const selectedQuiz = quizDatabase[randomIndex];
+
+            selectedQuiz.forEach((q, index) => {
+                let html = `
+                <div class="question" data-answer="${q.correct}">
+                    <p><strong>${q.question}</strong></p>`;
+                
+                for (const [letter, text] of Object.entries(q.answers)) {
+                    html += `<label><input type="radio" name="q${index}" value="${letter}"> <strong>${letter.toUpperCase()})</strong> ${text}</label>`;
+                }
+                
+                html += `<div class="feedback"></div></div>`;
+                qDiv.innerHTML += html;
+            });
+        }
+
+        function closeQuiz() {
+            modal.style.display = 'none';
+        }
+
+        function evaluateQuiz() {
+            let score = 0;
+            const questions = document.querySelectorAll('.question');
+            
+            questions.forEach(q => {
+                const correctAnswer = q.getAttribute('data-answer');
+                const selected = q.querySelector('input[type="radio"]:checked');
+                const feedback = q.querySelector('.feedback');
+
+                if (selected) {
+                    if (selected.value === correctAnswer) {
+                        score++;
+                        feedback.innerText = "Helyes válasz!";
+                        feedback.className = "feedback correct";
+                    } else {
+                        feedback.innerText = "Helytelen! A helyes válasz: " + correctAnswer.toUpperCase() + ".";
+                        feedback.className = "feedback incorrect";
+                    }
+                } else {
+                    feedback.innerText = "Nem adtál meg választ!";
+                    feedback.className = "feedback incorrect";
+                }
+            });
+
+            document.getElementById('quizScore').innerText = `Eredmény: ${score} / ${questions.length} pont`;
+        }
+
+        // Bezárás, ha a sötét háttérre kattint a felhasználó
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeQuiz();
+            }
+        }
+    </script>
+</body>
+</html>
+
+</body>
+</html>
